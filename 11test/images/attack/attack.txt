@@ -1,0 +1,8 @@
+./images/attack/Attack (1).png
+./images/attack/Attack (2).png
+./images/attack/Attack (3).png
+./images/attack/Attack (4).png
+./images/attack/Attack (5).png
+./images/attack/Attack (6).png
+./images/attack/Attack (7).png
+./images/attack/Attack (8).png
