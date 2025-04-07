@@ -1,72 +1,80 @@
-var foods = [];
-var myAnimation;
-var animations = [];
-var i = 0;
-var characterX = 100;
-var characterY = 250;
-var idlePaths = [];
-var boulders = [];
-var timeLeft = 60; // ⏱️ 60-second timer
-var gameOver = false;
-var score = 0;
-let kingImage;
+let characterX = 100;
+let characterY = 250;
+let characterW = 100;
+let characterH = 150;
+
+let health = 100;
+const maxHealth = 100;
+
+let boulders = [];
+let foods = [];
+let idlePaths = [];
+let i = 0;
+let animations = [];
+let timeLeft = 60;
+let gameOver = false;
+let score = 0;
+
 let knightImage;
 
+let obstacles = [];
+
 function preload() {
+  knightImage = loadImage('./images/png/KnightIdle__001.png');
   idlePaths = loadStrings("./images/idle.txt");
-  knightImage = loadImage('./images/png/KnightIdle__001.png')
 }
 
 function setup() {
   createCanvas(800, 500);
   textFont('Arial');
-  kingImage = createSprite(450, 200);
-  kingImage.scale = 0.05;
-  kingImage.addImage(knightImage);
 
-  // Load boulders
-  for (let b = 0; b < 5; b++) {
-    let myBoulder = new boulderImage("/images/boulder.png", random(10, 600), random(10, 400), 75, 75);
-    myBoulder.loadBoulder();
-    boulders[b] = myBoulder;
-  }
+  // Optional knight sprite if you want to display image
+  kingSprite = createGraphics(characterW, characterH);
+  kingSprite.image(knightImage, 0, 0, characterW, characterH);
 
-  // Load animation frames
-  for (let a = 0; a < idlePaths.length; a++) {
-    myAnimation = new animationImages(
-      idlePaths[a],
-      characterX,
-      characterY,
-      100,
-      150
-    );
-    animations[a] = myAnimation;
+  // Generate obstacles
+  for (let i = 0; i < 3; i++) {
+    let obs = {
+      x: random(100, 700),
+      y: random(100, 400),
+      w: 80,
+      h: 80
+    };
+    obstacles.push(obs);
   }
 
   // Generate food
-  for (let j = 0; j < 3; j++) {
+  for (let j = 0; j < 5; j++) {
     let x = random(50, 750);
     let y = random(50, 450);
     let d = random(20, 50);
     foods.push(new food(x, y, d));
   }
 
+  setInterval(decreaseTime, 1000);
   setInterval(incrementIdleIndex, 150);
-  setInterval(decreaseTime, 1000); // ⏱️ call every second
 }
 
 function draw() {
   background(120);
 
-  // ⏱️ Show time left
+  // UI
   fill(255);
   textSize(18);
   textAlign(LEFT);
   text("Score: " + score, 20, 30);
   text("Time Left: " + timeLeft + "s", 20, 55);
-  drawSprites();
 
-  if (gameOver) {
+  // Health Bar
+  fill(255);
+  text("Health:", 20, 80);
+  fill(200, 0, 0);
+  rect(90, 67, maxHealth, 15);
+  fill(0, 255, 0);
+  rect(90, 67, health, 15);
+
+  // Game over check
+  if (gameOver || health <= 0) {
     fill(255, 50, 50);
     textSize(40);
     textAlign(CENTER, CENTER);
@@ -74,34 +82,51 @@ function draw() {
     return;
   }
 
-  
-
-  // Draw boulders
-  for (let b = 0; b < boulders.length; b++) {
-    boulders[b].drawBoulder();
+  // Draw obstacles
+  fill(100);
+  for (let obs of obstacles) {
+    rect(obs.x, obs.y, obs.w, obs.h);
   }
 
-  // Movement
-  if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) characterX -= 2;
-  if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) characterX += 2;
-  if (keyIsDown(UP_ARROW) || keyIsDown(87)) characterY -= 2;
-  if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) characterY += 2;
+  // Movement with collision check
+  let nextX = characterX;
+  let nextY = characterY;
 
-  // Update animation position & draw
-  animations[i].x = characterX;
-  animations[i].y = characterY;
-  animations[i].drawAnimation();
+  if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) nextX -= 2;
+  if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) nextX += 2;
+  if (keyIsDown(UP_ARROW) || keyIsDown(87)) nextY -= 2;
+  if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) nextY += 2;
 
-  // Food & collision
-  for (let k = 0; k < foods.length; k++) {
-    let f = foods[k];
+  // Collision check with obstacles
+  let collision = false;
+  for (let obs of obstacles) {
+    if (nextX < obs.x + obs.w &&
+        nextX + characterW > obs.x &&
+        nextY < obs.y + obs.h &&
+        nextY + characterH > obs.y) {
+      collision = true;
+      break;
+    }
+  }
 
+  if (!collision) {
+    characterX = nextX;
+    characterY = nextY;
+  } else {
+    health -= 0.5;
+    health = max(0, health);
+  }
+
+  // Draw knight image
+  image(knightImage, characterX, characterY, characterW, characterH);
+
+  // Food collision
+  for (let f of foods) {
     if (
       !f.isEaten &&
-      checkCollision(characterX, characterY, 100, 150, f.x, f.y, f.diameter)
+      checkCollision(characterX, characterY, characterW, characterH, f.x, f.y, f.diameter)
     ) {
       f.isEaten = true;
-      console.log("Yum! Ate a " + f.state + " food");
       if (f.state === "perfect") {
         score += 3;
       } else if (f.state === "fresh") {
@@ -110,7 +135,6 @@ function draw() {
         score += 0;
       }
     }
-
     f.drawCircle();
   }
 }
