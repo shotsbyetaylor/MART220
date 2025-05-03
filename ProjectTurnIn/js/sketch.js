@@ -1,4 +1,5 @@
 // sketch.js
+
 const canvasHeight = 3600;
 let titleFont, bodyFont, bgImage;
 let eraBoxes = [];
@@ -19,6 +20,19 @@ let audioPlayed = false;
 let gettingStartedVideos = [], videoBoxes = [];
 let turningPointVideos = [], turningPointVideoBoxes = [];
 let findingSuccessVideos = [], findingSuccessVideoBoxes = [];
+
+// ——— Artist statements ———
+const artistStatements = {
+  gettingStarted: [
+    'This video marks the start of my sports videography journey. It captures the initial skill (or lack thereof) I had when just starting off in my career as a sports videographer, symbolizing how you really can start from nothing, and you are not born with impressive skills (most of the time), but rather learn and adapt to these skills through trial and error, and in my case, a lot of error. This is the start of the “Foundation” section of my growth.'
+  ],
+  turningPoint: [
+    'This was my first video I did for UM Football with permission from their media team. I was not yet working with them, and I saw this as an opportunity to prove myself worthy of joining the media team in the next semester, which eventually would happen.'
+  ],
+  findingSuccess: [
+    'This was the first video of my 2024 High School Hype video series. It was a huge step up from previous videos as I had been reached out to by a local High School to come shoot their game as a paid freelance job. It felt like a full circle moment, being paid to do the very thing I had to sneak into previously. This was my first taste of success, and I look back at it as the turning point in my creative career.'
+  ]
+};
 
 function preload() {
   titleFont  = loadFont('assets/MangoGrotesque-BlackItalic.ttf');
@@ -46,7 +60,6 @@ function setup() {
 
 function draw() {
   background('#2b2b2b');
-  // Show or hide audio button only on timeline
   playAudioButton[ currentScene==='timeline' ? 'show' : 'hide' ]();
 
   if (currentScene === 'timeline') {
@@ -59,8 +72,6 @@ function draw() {
 
   handleCharacterMovement();
   if (currentScene === 'timeline') checkCollision();
-
-  // Always draw character last so it appears on top
   drawCharacter();
 }
 
@@ -112,6 +123,15 @@ function drawStaticUI() {
   textSize(24);
   fill(200);
   text('Scroll down to explore the exhibition', width/2, 170);
+
+  // ─── Disclaimer under "Scroll down…" ───
+  textSize(18);
+  fill(180);
+  textAlign(CENTER, TOP);
+  text(
+    'Some of the videos do not load as IFrames; feel free to click on the YouTube link though, those work just fine.',
+    width/10, 200, width * 0.8
+  );
 
   const imgW = width * 0.6;
   headerImageHeight = (bgImage.height / bgImage.width) * imgW;
@@ -237,9 +257,34 @@ function drawEraScene() {
   textFont(titleFont); textSize(48); fill(255); textAlign(CENTER, TOP);
   text(config.title, width/2, 50);
 
+  // ─── Disclaimer on era pages ───
+  textFont(bodyFont);
+  textSize(18);
+  fill(200);
+  textAlign(CENTER, TOP);
+  text(
+    'After you finish watching a video, click on the screen to make sure your WASD (or arrow) keys move the character rather than interacting with the video.',
+    width/10, 110, width * 0.8
+  );
+
   config.boxes.forEach((b, i) => {
     fill(80); rect(b.x, b.y, b.w, b.h, 20);
     (isCharacterTouchingBox(b) ? config.videos[i].show : config.videos[i].hide).call(config.videos[i]);
+
+    // ─── Artist statement under first video only ───
+    if (i === 0) {
+      const stmt = artistStatements[currentScene][0];
+      createDiv(`<p style="
+          color: #fff;
+          text-align: center;
+          font-family: MangoGrotesque-VF, sans-serif;
+          font-size: 16px;
+          margin: 8px 0 24px;
+        ">${stmt}</p>`)
+        .position(b.x, b.y + b.h + 10)
+        .size(b.w, 'auto')
+        .show();
+    }
   });
 
   // Back button
@@ -254,6 +299,8 @@ function drawEraScene() {
     character.x = width/2; character.y = 100;
   }
 }
+
+// ——— Era setup functions ———
 
 function setupGettingStartedVideos() {
   gettingStartedVideos = [];
@@ -270,10 +317,24 @@ function setupGettingStartedVideos() {
     const box = { x: width/2 - boxW/2, y, w: boxW, h: boxH };
     videoBoxes.push(box);
 
-    const iframe = createDiv(
-      `<iframe width="100%" height="100%" src="${src}" frameborder="0" allowfullscreen></iframe>`
-    ).position(box.x, box.y).size(boxW, boxH).hide();
-    gettingStartedVideos.push(iframe);
+    // build iframe + optional statement HTML
+    let html = `<iframe width="100%" height="100%" src="${src}" frameborder="0" allowfullscreen></iframe>`;
+    if (i === 0) {
+      html += `<p style="
+        color: #fff;
+        text-align: center;
+        font-family: MangoGrotesque-VF, sans-serif;
+        font-size: 16px;
+        margin: 8px 0 24px;
+      ">${artistStatements.gettingStarted[0]}</p>`;
+    }
+
+    const div = createDiv(html)
+      .position(box.x, box.y)
+      .size(boxW, boxH + (i===0 ? 60 : 0))  // give extra height if we added the statement
+      .hide();
+
+    gettingStartedVideos.push(div);
   });
 
   backButton.x = width/2 - 100;
@@ -295,10 +356,23 @@ function setupTurningPointVideos() {
     const box = { x: width/2 - boxW/2, y, w: boxW, h: boxH };
     turningPointVideoBoxes.push(box);
 
-    const iframe = createDiv(
-      `<iframe width="100%" height="100%" src="${src}" frameborder="0" allowfullscreen></iframe>`
-    ).position(box.x, box.y).size(boxW, boxH).hide();
-    turningPointVideos.push(iframe);
+    let html = `<iframe width="100%" height="100%" src="${src}" frameborder="0" allowfullscreen></iframe>`;
+    if (i === 0) {
+      html += `<p style="
+        color: #fff;
+        text-align: center;
+        font-family: MangoGrotesque-VF, sans-serif;
+        font-size: 16px;
+        margin: 8px 0 24px;
+      ">${artistStatements.turningPoint[0]}</p>`;
+    }
+
+    const div = createDiv(html)
+      .position(box.x, box.y)
+      .size(boxW, boxH + (i===0 ? 60 : 0))
+      .hide();
+
+    turningPointVideos.push(div);
   });
 
   backButton.x = width/2 - 100;
@@ -320,10 +394,23 @@ function setupFindingSuccessVideos() {
     const box = { x: width/2 - boxW/2, y, w: boxW, h: boxH };
     findingSuccessVideoBoxes.push(box);
 
-    const iframe = createDiv(
-      `<iframe width="100%" height="100%" src="${src}" frameborder="0" allowfullscreen></iframe>`
-    ).position(box.x, box.y).size(boxW, boxH).hide();
-    findingSuccessVideos.push(iframe);
+    let html = `<iframe width="100%" height="100%" src="${src}" frameborder="0" allowfullscreen></iframe>`;
+    if (i === 0) {
+      html += `<p style="
+        color: #fff;
+        text-align: center;
+        font-family: MangoGrotesque-VF, sans-serif;
+        font-size: 16px;
+        margin: 8px 0 24px;
+      ">${artistStatements.findingSuccess[0]}</p>`;
+    }
+
+    const div = createDiv(html)
+      .position(box.x, box.y)
+      .size(boxW, boxH + (i===0 ? 60 : 0))
+      .hide();
+
+    findingSuccessVideos.push(div);
   });
 
   backButton.x = width/2 - 100;
@@ -331,7 +418,6 @@ function setupFindingSuccessVideos() {
 }
 
 // ——— Movement & Collision ———
-
 function handleCharacterMovement() {
   if (keyIsDown(65) || keyIsDown(LEFT_ARROW))  character.x -= characterSpeed;
   if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) character.x += characterSpeed;
