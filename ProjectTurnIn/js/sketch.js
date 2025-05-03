@@ -21,7 +21,7 @@ let gettingStartedVideos = [], videoBoxes = [];
 let turningPointVideos = [], turningPointVideoBoxes = [];
 let findingSuccessVideos = [], findingSuccessVideoBoxes = [];
 
-// ——— Artist statements ———
+// Artist statements (first video only)
 const artistStatements = {
   gettingStarted: [
     'This video marks the start of my sports videography journey. It captures the initial skill (or lack thereof) I had when just starting off in my career as a sports videographer, symbolizing how you really can start from nothing, and you are not born with impressive skills (most of the time), but rather learn and adapt to these skills through trial and error, and in my case, a lot of error. This is the start of the “Foundation” section of my growth.'
@@ -53,14 +53,14 @@ function setup() {
   setupFinalAndBTSBoxes(headerImageY + headerImageHeight + 800);
 
   playAudioButton = createButton('▶️ Play Intro Audio')
-    .position(width/2 - 100, headerImageY + headerImageHeight + 20);
+    .position(width/2 - 100, headerImageY + headerImageHeight + 20)
+    .mousePressed(handlePlayAudio);
   styleButton(playAudioButton);
-  playAudioButton.mousePressed(handlePlayAudio);
 }
 
 function draw() {
   background('#2b2b2b');
-  playAudioButton[ currentScene==='timeline' ? 'show' : 'hide' ]();
+  playAudioButton[currentScene === 'timeline' ? 'show' : 'hide']();
 
   if (currentScene === 'timeline') {
     drawStaticUI();
@@ -83,7 +83,7 @@ function windowResized() {
   playAudioButton.position(width/2 - 100, headerImageY + headerImageHeight + 20);
 }
 
-// ——— Utility Functions ———
+// ─── Utility ───
 
 function removeMargins() {
   document.body.style.margin = '0';
@@ -110,7 +110,7 @@ function handlePlayAudio() {
   }
 }
 
-// ——— Static UI ———
+// ─── Static UI ───
 
 function drawStaticUI() {
   textFont(titleFont);
@@ -124,12 +124,12 @@ function drawStaticUI() {
   fill(200);
   text('Scroll down to explore the exhibition', width/2, 170);
 
-  // ─── Disclaimer under "Scroll down…" ───
+  // Disclaimer under "Scroll down"
   textSize(18);
   fill(180);
   textAlign(CENTER, TOP);
   text(
-    'Some of the videos do not load as IFrames; feel free to click on the YouTube link though, those work just fine.',
+    'Some of the videos do not load as IFrames; feel free to click on the YouTube link though—those work just fine.',
     width/10, 200, width * 0.8
   );
 
@@ -138,7 +138,7 @@ function drawStaticUI() {
   image(bgImage, width/2 - imgW/2, headerImageY, imgW, headerImageHeight);
 }
 
-// ——— Timeline ———
+// ─── Timeline ───
 
 function setupTimeline() {
   const baseY = headerImageY + headerImageHeight + 200;
@@ -153,7 +153,10 @@ function setupTimeline() {
 
 function drawTimeline() {
   const y = headerImageY + headerImageHeight + 250;
-  textFont(titleFont); textSize(60); fill(255); textAlign(CENTER, BOTTOM);
+  textFont(titleFont);
+  textSize(60);
+  fill(255);
+  textAlign(CENTER, BOTTOM);
   text('Choose Your Era', width/2, y - 40);
 
   stroke(200); strokeWeight(4);
@@ -162,19 +165,22 @@ function drawTimeline() {
   line(50, y - 15, 50, y + 15);
   line(width - 50, y - 15, width - 50, y + 15);
 
-  noStroke(); textFont(bodyFont); textSize(20);
+  noStroke();
+  textFont(bodyFont);
+  textSize(20);
   eraBoxes.forEach(b => {
-    fill(80); rect(b.x, b.y, b.w, b.h, 20);
-    fill(255); textAlign(CENTER, CENTER);
+    fill(80);
+    rect(b.x, b.y, b.w, b.h, 20);
+    fill(255);
+    textAlign(CENTER, CENTER);
     text(b.label, b.x + b.w/2, b.y + b.h/2);
     stroke(200); strokeWeight(3);
-    const cx = b.x + b.w/2;
-    line(cx, y - 10, cx, y + 10);
+    line(b.x + b.w/2, y - 10, b.x + b.w/2, y + 10);
     noStroke();
   });
 }
 
-// ——— Final + BTS Videos ———
+// ─── Final + BTS ───
 
 function setupFinalAndBTSBoxes(startY) {
   const w = width * 0.6, h = 400;
@@ -193,24 +199,31 @@ function setupFinalAndBTSBoxes(startY) {
 
   urls.forEach((url, i) => {
     const y = yStart + i * (h + 50);
-    const box = { x: width/2 - w/2, y, w, h };
-    btsVideoBoxes.push(box);
-
-    const iframe = createDiv(
-      `<iframe width="100%" height="100%" src="${url}" frameborder="0" allowfullscreen></iframe>`
-    ).position(box.x, box.y).size(w, h).hide();
-    btsVideoDivs.push(iframe);
+    btsVideoBoxes.push({ x: width/2 - w/2, y, w, h });
+    btsVideoDivs.push(
+      createDiv(`<iframe width="100%" height="100%" src="${url}" frameborder="0" allowfullscreen></iframe>`)
+        .position(width/2 - w/2, y)
+        .size(w, h)
+        .hide()
+    );
   });
 }
 
 function drawFinalVideoSection() {
-  textFont(titleFont); textSize(48); fill(255); textAlign(CENTER, TOP);
+  textFont(titleFont);
+  textSize(48);
+  fill(255);
+  textAlign(CENTER, TOP);
   text('Final Video - Junior Bergen Draft', width/2, finalVideoBox.y - 80);
 
-  fill(80); rect(finalVideoBox.x, finalVideoBox.y, finalVideoBox.w, finalVideoBox.h, 20);
+  fill(80);
+  rect(finalVideoBox.x, finalVideoBox.y, finalVideoBox.w, finalVideoBox.h, 20);
   (isCharacterTouchingBox(finalVideoBox) ? finalVideoDiv.show : finalVideoDiv.hide).call(finalVideoDiv);
 
-  textFont(bodyFont); textSize(24); fill(200); textAlign(LEFT, TOP);
+  textFont(bodyFont);
+  textSize(24);
+  fill(200);
+  textAlign(LEFT, TOP);
   text(
     'This is the most important video that I have ever made. It was a full circle moment working for Junior.',
     finalVideoBox.x,
@@ -218,33 +231,34 @@ function drawFinalVideoSection() {
     finalVideoBox.w
   );
 
-  textFont(titleFont); textSize(40); fill(255); textAlign(CENTER, TOP);
+  textFont(titleFont);
+  textSize(40);
+  fill(255);
+  textAlign(CENTER, TOP);
   text('Behind The Scenes (Extra)', width/2, btsVideoBoxes[0].y - 80);
 
   btsVideoBoxes.forEach((b, i) => {
-    fill(80); rect(b.x, b.y, b.w, b.h, 20);
+    fill(80);
+    rect(b.x, b.y, b.w, b.h, 20);
     (isCharacterTouchingBox(b) ? btsVideoDivs[i].show : btsVideoDivs[i].hide).call(btsVideoDivs[i]);
   });
 }
 
-// ——— Era Scenes ———
+// ─── Era Scenes ───
 
 function drawEraScene() {
   const config = {
     gettingStarted: {
-      title: 'Getting Started Era',
       setup:  setupGettingStartedVideos,
       videos: gettingStartedVideos,
       boxes:  videoBoxes
     },
     turningPoint: {
-      title: 'Turning Point Era',
       setup:  setupTurningPointVideos,
       videos: turningPointVideos,
       boxes:  turningPointVideoBoxes
     },
     findingSuccess: {
-      title: 'Finding Success Era',
       setup:  setupFindingSuccessVideos,
       videos: findingSuccessVideos,
       boxes:  findingSuccessVideoBoxes
@@ -254,10 +268,18 @@ function drawEraScene() {
   if (!config.videos.length) config.setup();
 
   background(30);
-  textFont(titleFont); textSize(48); fill(255); textAlign(CENTER, TOP);
-  text(config.title, width/2, 50);
+  textFont(titleFont);
+  textSize(48);
+  fill(255);
+  textAlign(CENTER, TOP);
+  text(
+    currentScene === 'gettingStarted'    ? 'Getting Started Era' :
+    currentScene === 'turningPoint'      ? 'Turning Point Era' :
+    'Finding Success Era',
+    width/2, 50
+  );
 
-  // ─── Disclaimer on era pages ───
+  // Disclaimer on era pages
   textFont(bodyFont);
   textSize(18);
   fill(200);
@@ -267,45 +289,57 @@ function drawEraScene() {
     width/10, 110, width * 0.8
   );
 
-  config.boxes.forEach((b, i) => {
-    fill(80); rect(b.x, b.y, b.w, b.h, 20);
-    (isCharacterTouchingBox(b) ? config.videos[i].show : config.videos[i].hide).call(config.videos[i]);
+  // draw boxes & show/hide containers
+  for (let i = 0; i < config.boxes.length; i++) {
+    const b = config.boxes[i];
+    fill(80);
+    rect(b.x, b.y, b.w, b.h, 20);
 
-    // ─── Artist statement under first video only ───
-    if (i === 0) {
-      const stmt = artistStatements[currentScene][0];
-      createDiv(`<p style="
-          color: #fff;
-          text-align: center;
-          font-family: MangoGrotesque-VF, sans-serif;
-          font-size: 16px;
-          margin: 8px 0 24px;
-        ">${stmt}</p>`)
-        .position(b.x, b.y + b.h + 10)
-        .size(b.w, 'auto')
-        .show();
+    if (isCharacterTouchingBox(b)) {
+      config.videos[i].show();
+    } else {
+      config.videos[i].hide();
     }
-  });
+  }
 
   // Back button
-  fill(100,100,255); rect(backButton.x, backButton.y, backButton.w, backButton.h, 20);
+  fill(100,100,255);
+  rect(backButton.x, backButton.y, backButton.w, backButton.h, 20);
   fill(255);
-  textFont(bodyFont); textSize(24); textAlign(CENTER, CENTER);
+  textFont(bodyFont);
+  textSize(24);
+  textAlign(CENTER, CENTER);
   text('Back to Timeline', backButton.x + backButton.w/2, backButton.y + backButton.h/2);
 
   if (isCharacterTouchingBox(backButton)) {
     currentScene = 'timeline';
     window.scrollTo(0,0);
-    character.x = width/2; character.y = 100;
+    character.x = width/2;
+    character.y = 100;
+
+    // Hide all era containers
+    gettingStartedVideos.forEach(div => div.hide());
+    turningPointVideos.forEach(div => div.hide());
+    findingSuccessVideos.forEach(div => div.hide());
+
+    // Remove any remaining artist statements
+    selectAll('.artist-statement').forEach(el => el.remove());
   }
 }
 
-// ——— Era setup functions ———
+// ─── Era setup functions ───
 
 function setupGettingStartedVideos() {
   gettingStartedVideos = [];
   videoBoxes = [];
-  const boxW = width*0.6, boxH = 400, spacing = 100, startY = 180;
+
+  const boxW = width * 0.6,
+        boxH = 400,
+        spacing = 100,
+        startY = 180,
+        statementHeight = 60;
+  let currentY = startY;
+
   const urls = [
     'https://www.youtube.com/embed/BGGA9Xhh0Y0?...',
     'https://www.youtube.com/embed/gqSSpSoFZEw?...',
@@ -313,38 +347,54 @@ function setupGettingStartedVideos() {
   ];
 
   urls.forEach((src, i) => {
-    const y = startY + i*(boxH + spacing);
-    const box = { x: width/2 - boxW/2, y, w: boxW, h: boxH };
-    videoBoxes.push(box);
+    const b = { x: width/2 - boxW/2, y: currentY, w: boxW, h: boxH };
+    videoBoxes.push(b);
 
-    // build iframe + optional statement HTML
-    let html = `<iframe width="100%" height="100%" src="${src}" frameborder="0" allowfullscreen></iframe>`;
+    // Container for iframe + optional statement
+    const cont = createDiv().hide();
+    // iframe
+    createElement('iframe')
+      .attribute('width','100%')
+      .attribute('height',`${boxH}px`)
+      .attribute('src', src)
+      .attribute('frameborder','0')
+      .attribute('allowfullscreen','')
+      .parent(cont);
+
+    // artist statement under first video
     if (i === 0) {
-      html += `<p style="
-        color: #fff;
-        text-align: center;
-        font-family: MangoGrotesque-VF, sans-serif;
-        font-size: 16px;
-        margin: 8px 0 24px;
-      ">${artistStatements.gettingStarted[0]}</p>`;
+      createDiv(artistStatements.gettingStarted[0])
+        .addClass('artist-statement')
+        .style('color','white')
+        .style('text-align','center')
+        .style('font-family','MangoGrotesque-VF')
+        .style('font-size','16px')
+        .style('margin','8px 0 0')
+        .parent(cont);
     }
 
-    const div = createDiv(html)
-      .position(box.x, box.y)
-      .size(boxW, boxH + (i===0 ? 60 : 0))  // give extra height if we added the statement
-      .hide();
+    cont.position(b.x, b.y)
+        .size(boxW, boxH + (i===0 ? statementHeight : 0));
 
-    gettingStartedVideos.push(div);
+    gettingStartedVideos.push(cont);
+    currentY += boxH + (i===0 ? statementHeight : 0) + spacing;
   });
 
-  backButton.x = width/2 - 100;
-  backButton.y = videoBoxes[2].y + 520;
+  backButton.x = width/2 - backButton.w/2;
+  backButton.y = currentY;
 }
 
 function setupTurningPointVideos() {
-  turningPointVideos     = [];
+  turningPointVideos = [];
   turningPointVideoBoxes = [];
-  const boxW = width*0.6, boxH = 400, spacing = 100, startY = 180;
+
+  const boxW = width * 0.6,
+        boxH = 400,
+        spacing = 100,
+        startY = 180,
+        statementHeight = 60;
+  let currentY = startY;
+
   const urls = [
     'https://www.youtube.com/embed/duetIIW_y58?...',
     'https://www.youtube.com/embed/PwwJgoU5Doo?...',
@@ -352,72 +402,94 @@ function setupTurningPointVideos() {
   ];
 
   urls.forEach((src, i) => {
-    const y = startY + i*(boxH + spacing);
-    const box = { x: width/2 - boxW/2, y, w: boxW, h: boxH };
-    turningPointVideoBoxes.push(box);
+    const b = { x: width/2 - boxW/2, y: currentY, w: boxW, h: boxH };
+    turningPointVideoBoxes.push(b);
 
-    let html = `<iframe width="100%" height="100%" src="${src}" frameborder="0" allowfullscreen></iframe>`;
+    const cont = createDiv().hide();
+    createElement('iframe')
+      .attribute('width','100%')
+      .attribute('height',`${boxH}px`)
+      .attribute('src', src)
+      .attribute('frameborder','0')
+      .attribute('allowfullscreen','')
+      .parent(cont);
+
     if (i === 0) {
-      html += `<p style="
-        color: #fff;
-        text-align: center;
-        font-family: MangoGrotesque-VF, sans-serif;
-        font-size: 16px;
-        margin: 8px 0 24px;
-      ">${artistStatements.turningPoint[0]}</p>`;
+      createDiv(artistStatements.turningPoint[0])
+        .addClass('artist-statement')
+        .style('color','white')
+        .style('text-align','center')
+        .style('font-family','MangoGrotesque-VF')
+        .style('font-size','16px')
+        .style('margin','8px 0 0')
+        .parent(cont);
     }
 
-    const div = createDiv(html)
-      .position(box.x, box.y)
-      .size(boxW, boxH + (i===0 ? 60 : 0))
-      .hide();
+    cont.position(b.x, b.y)
+        .size(boxW, boxH + (i===0 ? statementHeight : 0));
 
-    turningPointVideos.push(div);
+    turningPointVideos.push(cont);
+    currentY += boxH + (i===0 ? statementHeight : 0) + spacing;
   });
 
-  backButton.x = width/2 - 100;
-  backButton.y = turningPointVideoBoxes[2].y + 520;
+  backButton.x = width/2 - backButton.w/2;
+  backButton.y = currentY;
 }
 
 function setupFindingSuccessVideos() {
-  findingSuccessVideos     = [];
+  findingSuccessVideos = [];
   findingSuccessVideoBoxes = [];
-  const boxW = width*0.6, boxH = 400, spacing = 100, startY = 180;
+
+  const boxW = width * 0.6,
+        boxH = 400,
+        spacing = 100,
+        startY = 180,
+        statementHeight = 60;
+  let currentY = startY;
+
   const urls = [
     'https://www.youtube.com/embed/SA1mRbkFJto?...',
     'https://www.youtube.com/embed/ozpeuy6oxAo?...',
-    'https://www.youtube.com/embed/wfLTGntqxFc?...'
+    'https://www.youtube.com/embed/KUWy5wTu938?...'
   ];
 
   urls.forEach((src, i) => {
-    const y = startY + i*(boxH + spacing);
-    const box = { x: width/2 - boxW/2, y, w: boxW, h: boxH };
-    findingSuccessVideoBoxes.push(box);
+    const b = { x: width/2 - boxW/2, y: currentY, w: boxW, h: boxH };
+    findingSuccessVideoBoxes.push(b);
 
-    let html = `<iframe width="100%" height="100%" src="${src}" frameborder="0" allowfullscreen></iframe>`;
+    const cont = createDiv().hide();
+    createElement('iframe')
+      .attribute('width','100%')
+      .attribute('height',`${boxH}px`)
+      .attribute('src', src)
+      .attribute('frameborder','0')
+      .attribute('allowfullscreen','')
+      .parent(cont);
+
     if (i === 0) {
-      html += `<p style="
-        color: #fff;
-        text-align: center;
-        font-family: MangoGrotesque-VF, sans-serif;
-        font-size: 16px;
-        margin: 8px 0 24px;
-      ">${artistStatements.findingSuccess[0]}</p>`;
+      createDiv(artistStatements.findingSuccess[0])
+        .addClass('artist-statement')
+        .style('color','white')
+        .style('text-align','center')
+        .style('font-family','MangoGrotesque-VF')
+        .style('font-size','16px')
+        .style('margin','8px 0 0')
+        .parent(cont);
     }
 
-    const div = createDiv(html)
-      .position(box.x, box.y)
-      .size(boxW, boxH + (i===0 ? 60 : 0))
-      .hide();
+    cont.position(b.x, b.y)
+        .size(boxW, boxH + (i===0 ? statementHeight : 0));
 
-    findingSuccessVideos.push(div);
+    findingSuccessVideos.push(cont);
+    currentY += boxH + (i===0 ? statementHeight : 0) + spacing;
   });
 
-  backButton.x = width/2 - 100;
-  backButton.y = findingSuccessVideoBoxes[2].y + 520;
+  backButton.x = width/2 - backButton.w/2;
+  backButton.y = currentY;
 }
 
-// ——— Movement & Collision ———
+// ─── Movement & Collision ───
+
 function handleCharacterMovement() {
   if (keyIsDown(65) || keyIsDown(LEFT_ARROW))  character.x -= characterSpeed;
   if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) character.x += characterSpeed;
