@@ -212,7 +212,7 @@ function drawFinalVideoSection() {
 
   textFont(bodyFont); textSize(24); fill(200); textAlign(LEFT, TOP);
   text(
-    'This is the most important video… I found success.',
+    'This is the most important video that I have ever made. It was a full circle moment working for Junior.',
     finalVideoBox.x,
     finalVideoBox.y + finalVideoBox.h + 30,
     finalVideoBox.w
