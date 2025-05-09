@@ -1,6 +1,6 @@
 // sketch.js
 
-const canvasHeight = 3600;
+const canvasHeight = 4600;
 let titleFont, bodyFont, bgImage;
 let eraBoxes = [];
 let character, characterSpeed = 5;
